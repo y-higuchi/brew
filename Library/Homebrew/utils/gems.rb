@@ -8,7 +8,7 @@ module Homebrew
   def setup_gem_environment!
     @setup_gem_environment ||= begin
       # Match where our bundler gems are.
-      ruby_bindir = RbConfig::CONFIG["ruby_bindir"]
+      ruby_bindir = "#{RbConfig::CONFIG["prefix"]}/bin"
       ENV["GEM_HOME"] = "#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/vendor/bundle/ruby/#{RbConfig::CONFIG["ruby_version"]}"
       ENV["GEM_PATH"] = ENV["GEM_HOME"]
 
@@ -20,7 +20,14 @@ module Homebrew
       paths = ENV["PATH"].split(":")
       paths.unshift(ruby_bindir) unless paths.include?(ruby_bindir)
       paths.unshift(Gem.bindir) unless paths.include?(Gem.bindir)
-      ENV["PATH"] = paths.join(":")
+      ENV["PATH"] = paths.compact.join(":")
+
+      puts "ruby_bindir: #{ruby_bindir}"
+      puts "Gem.bindir: #{Gem.bindir}"
+      puts "PATH: #{ENV["PATH"]}"
+      puts "GEM_HOME: #{ENV["GEM_HOME"]}"
+      puts "GEM_PATH: #{ENV["GEM_PATH"]}"
+
       true
     end
   end
@@ -34,6 +41,8 @@ module Homebrew
     install_args = %W[--no-document #{name}]
     install_args << "--version" << version if version
     return if system "gem", "install", *install_args
+
+    puts `gem install #{install_args.join(" ")} 2>&1`
 
     $stderr.puts "Error: failed to install the '#{name}' gem."
     exit 1
