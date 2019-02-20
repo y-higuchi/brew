@@ -300,6 +300,11 @@ case "$HOMEBREW_COMMAND" in
   -v)          HOMEBREW_COMMAND="--version" ;;
 esac
 
+if [[ "$HOMEBREW_COMMAND" = "style" ]]
+then
+  export HOMEBREW_INSTALL_BUNDLER_GEMS_FIRST="1"
+fi
+
 if [[ "$HOMEBREW_COMMAND" = "cask" ]]
 then
   HOMEBREW_CASK_COMMAND="$1"
